@@ -1,0 +1,11 @@
+name: TerraLootbags
+description: Lootbags for pocketmine
+version: 0.0.1
+api: 5.0.0
+author: bonanoo
+main: bonanoo\Lootbags\Main
+
+permissions:
+  lootbags.command.lootbags:
+    default: op
+    description: Permission to use /lootbag command
