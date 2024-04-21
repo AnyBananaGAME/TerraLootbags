@@ -2,6 +2,19 @@
 
 ### PocketMine-MP plugin that lets you create your own lootbags and custom rewards for then (Items, Commands)
 
+:robot: Commands:
+
+
+```js
+lootbag/lootbags:
+  // Give a player online a lootbag
+  give: <player> <lootbag> <count>
+  // Give everyone online a lootbag or multiple
+  giveall <lootbag> <count>
+  // View lootbag loot, coming soon
+  view: Coming soon...
+```
+
 
 Example Lootbag:
 ```yml
