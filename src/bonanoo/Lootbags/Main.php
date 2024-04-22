@@ -3,6 +3,7 @@ namespace bonanoo\Lootbags;
 
 use bonanoo\Lootbags\commands\LootbagCommand;
 use CortexPE\Commando\PacketHooker;
+use muqsit\invmenu\InvMenuHandler;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
@@ -24,6 +25,9 @@ class Main extends PluginBase {
     public function onEnable(): void{
         $this->lootbags = new Config($this->getDataFolder()."lootbags.yml", Config::YAML);
         $this->lootBagH = new LootbagHandler($this);
+        if(!InvMenuHandler::isRegistered()){
+            InvMenuHandler::register($this);
+        }
         if(!PacketHooker::isRegistered()) {
             PacketHooker::register($this);
         }

@@ -18,16 +18,13 @@ class GiveSubCommand extends BaseSubCommand {
     }
 
     public function prepare(): void{
+        $this->setPermissions(["lootbags.command.give"]);
         $this->registerArgument(0, new TargetPlayerArgument(false, "player"));
         $this->registerArgument(1, new RawStringArgument("lootbag", false));
         $this->registerArgument(2, new IntegerArgument("count", false));
     }
 
     public function onRun(CommandSender $sender, string $aliasUsed, array $args): void{
-        if(!$sender instanceof Player) {
-            $sender->sendMessage(Main::$PREFIX . TextFormat::RED . " You may not execute this command outside IN-GAME");
-            return;
-        }
         $player = Main::getInstance()->getServer()->getPlayerExact($args["player"]);
         if(!$player instanceof  Player){
             $sender->sendMessage(Main::$PREFIX . TextFormat::RED . " This player is not ingame");

@@ -4,8 +4,10 @@ namespace bonanoo\Lootbags\commands;
 
 use bonanoo\Lootbags\commands\sub\GiveAllSubCommand;
 use bonanoo\Lootbags\commands\sub\GiveSubCommand;
+use bonanoo\Lootbags\commands\sub\ViewSubCommand;
 use bonanoo\Lootbags\Main;
 use CortexPE\Commando\BaseCommand;
+use Couchbase\View;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\lang\Translatable;
@@ -23,7 +25,7 @@ class LootbagCommand extends BaseCommand {
         $this->setDescription("Lootbags command");
         $this->registerSubCommand(new GiveSubCommand());
         $this->registerSubCommand(new GiveAllSubCommand());
-
+        $this->registerSubCommand(new ViewSubCommand());
     }
 
    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void{

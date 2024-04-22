@@ -15,6 +15,7 @@ class GiveAllSubCommand extends BaseSubCommand{
         parent::__construct(Main::getInstance(), "giveall" , "Give player a lootbag" , ["givea"]);
     }
     protected function prepare(): void{
+        $this->setPermissions(["lootbags.command.give"]);
         $this->registerArgument(0, new RawStringArgument("lootbag", false));
         $this->registerArgument(1, new IntegerArgument("count", false));
     }

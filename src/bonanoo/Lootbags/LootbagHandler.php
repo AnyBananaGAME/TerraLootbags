@@ -33,6 +33,19 @@ class LootbagHandler{
             $this->lootbags[strtolower($type)] = $bag;
         }
     }
+
+    public function lootbagExists(string $lootbag): bool{
+        return isset($this->lootbags[strtolower($lootbag)]);
+    }
+
+    public function getLootbagAsClass($lootbag): Lootbag | int{
+        if(isset($this->lootbags[strtolower($lootbag)])){
+            return $this->lootbags[strtolower($lootbag)];
+        } else {
+            return 0;
+        }
+    }
+
     public function getLootBag(string $type, $count = 1): Item|string{
         $lowercase = strtolower($type);
         if(!isset($lowercase, $this->lootbags)){
@@ -49,9 +62,8 @@ class LootbagHandler{
         return $lootbag;
     }
 
-    public function getReward(){
+    public function getReward(){}
 
-    }
     public function finishOpen($rewards, int $count,  Player $player, Item $lootbagItem){
         $randomItem = array_rand($rewards, $count);
         $data = explode(":", $rewards[$randomItem]);
@@ -131,11 +143,7 @@ class LootbagHandler{
                         if($lootbag->chance >= $rand){
                             $damager->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have found a " . $lootbag->name . " lootbag");
                             $this->addItem($damager, Main::getInstance()->getLootbagHandler()->getLootBag($key));
-                        }
-                    }
-                }
-            }
-
+        }   }   }   }
         } else {
             if(!$event->isCancelled()){
                 $player = $event->getPlayer();
