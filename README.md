@@ -5,17 +5,13 @@ Need help?
 ❓ [Discord](https://discord.gg/Mfu9CER8X2) 👾
 
 
-:robot: Commands:
 
-```js
-lootbag/lootbags:
-  // Give a player online a lootbag
-  give: <player> <lootbag> <count>
-  // Give everyone online a lootbag or multiple
-  giveall: <lootbag> <count>
-  // View lootbag loot in a CHEST UI
-  view: <lootbag>
-```
+:robot: **Commands:**
+
+- `lootbag give <player> <lootbag> <count>`: Give a specific player a certain number of lootbags.
+- `lootbag giveall <lootbag> <count>`: Distribute a specified number of lootbags to all online players.
+- `lootbag view <lootbag>`: View the contents of a particular lootbag in a chest interface.
+
 
 📇 🤯
 Example Lootbag:
