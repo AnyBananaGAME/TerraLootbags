@@ -109,6 +109,10 @@ class LootbagHandler{
                 if(!is_string($reward)) $loot[] = $reward;
             }
         }
+        $inventory = $player->getInventory();
+        $itemInHand = $inventory->getItemInHand();
+        $itemInHand = $itemInHand->setCount($itemInHand->getCount()-1);
+        $inventory->setItemInHand($itemInHand);
 
         foreach ($loot as $key => $lootItem) {
             if($lootItem instanceof Item) {
@@ -164,8 +168,8 @@ class LootbagHandler{
                 if(in_array(1, $lootbag->obtainable)){
                     $rand = mt_rand(1, 1000);
                     if($lootbag->chance >= $rand){
-                        $damager->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have found a " . $lootbag->name . " lootbag");
-                        $this->addItem($damager, Main::getInstance()->getLootbagHandler()->getLootBag($key));
+                        $luckyPenguin->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have found a " . $lootbag->name . " lootbag");
+                        $this->addItem($luckyPenguin, Main::getInstance()->getLootbagHandler()->getLootBag($key));
                     }
                 }
             }
