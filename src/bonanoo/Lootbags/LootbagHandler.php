@@ -62,16 +62,11 @@ class LootbagHandler{
         return $lootbag;
     }
 
-    public function getReward(){}
-
-    public function finishOpen($rewards, int $count,  Player $player, Item $lootbagItem){
-        $randomItem = array_rand($rewards, $count);
-        $data = explode(":", $rewards[$randomItem]);
-        if($data[0] === "command"){
+    public function getReward(Array $data, Player $player): Item | string{
+        if ($data[0] === "command") {
             $command = $data[2];
             $command = str_replace("{player}", $player->getName(), $command);
-            Main::getInstance()->getServer()->dispatchCommand(new ConsoleCommandSender(Main::getInstance()->getServer(), Main::getInstance()->getServer()->getLanguage()), $command);
-            $player->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have received " . $data[1] . " from a ". $lootbagItem->getName() ." lootbag");
+            return $command;
         } else {
             $item = StringToItemParser::getInstance()->parse($data[0]);
             if ($item === null) {
@@ -79,35 +74,51 @@ class LootbagHandler{
             }
             $item->setCount($data[1]);
 
-            if(strtolower($data[2]) !== "false"){
+            if (strtolower($data[2]) !== "false") {
                 $item->setCustomName($data[2]);
             }
 
             $enchantment = null;
 
-            if(isset($data[3])){
+            if (isset($data[3])) {
                 for ($i = 3; $i < count($data); $i += 2) {
-                    $enchantment = StringToEnchantmentParser::getInstance()->parse((string) $data[$i]);
+                    $enchantment = StringToEnchantmentParser::getInstance()->parse((string)$data[$i]);
                     if ($enchantment !== null && isset($data[$i + 1])) {
-                        $item->addEnchantment(new EnchantmentInstance($enchantment, (int) $data[$i + 1]));
+                        $item->addEnchantment(new EnchantmentInstance($enchantment, (int)$data[$i + 1]));
                     }
                 }
             }
-            $inventory = $player->getInventory();
-            $player->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have received a " . $item->getName() . " from a ". $lootbagItem->getName() ." lootbag");
-            $this->addItem($player, $item);
-
+            return $item;
         }
-        $inventory = $player->getInventory();
-        $itemInHand = $inventory->getItemInHand();
-
-        if(!$itemInHand->getNamedTag()->getTag(self::$LOOTBAG_NAMEDTAG) instanceof StringTag){
-            $player->kick(Main::$PREFIX."There was an issue with opening a lootbag. The item in hand is not a lootbag");
-        }
-        $itemInHand->setCount($itemInHand->getCount()-1);
-        $inventory->setItemInHand($itemInHand);
-
     }
+
+    public function finishOpen($rewards, int $count, Player $player, Item $lootbagItem){
+        $randomItem = array_rand($rewards, $count);
+        $loot = [];
+        if (is_int($randomItem)) {
+                $data = explode(":", $rewards[$randomItem]);
+                $reward = $this->getReward($data, $player);
+                $loot[] = $reward;
+        }
+        if(is_array($randomItem)){
+            foreach ($randomItem as $random) {
+                $data = explode(":", $rewards[$random]);
+                $reward = $this->getReward($data, $player);
+                $loot[] = $reward;
+            }
+        }
+
+        foreach ($loot as $key => $lootItem) {
+            if($lootItem instanceof Item) {
+                $this->addItem($player, $lootItem);
+                $player->sendMessage(Main::$PREFIX . TextFormat::GRAY . " You have received " . $lootItem->getName() . " from a " . $lootbagItem->getName() . " lootbag");
+            } else {
+                Main::getInstance()->getServer()->dispatchCommand(new ConsoleCommandSender(Main::getInstance()->getServer(), Main::getInstance()->getServer()->getLanguage()), $lootItem);
+                $player->sendMessage(Main::$PREFIX . TextFormat::GRAY . " You have received " . $key . " from a " . $lootbagItem->getName() . " lootbag");
+            }
+        }
+    }
+
     public function handleOpen(BlockPlaceEvent | PlayerItemUseEvent $event): void{
         if($event instanceof BlockPlaceEvent || $event instanceof PlayerItemUseEvent) {
             $item = $event->getItem();
@@ -130,6 +141,8 @@ class LootbagHandler{
     }
 
     public function obtainOnEvent(BlockBreakEvent | EntityDamageEvent $event){
+        $luckyPenguin = '';
+
         if($event instanceof EntityDamageByEntityEvent){
             $entity = $event->getEntity();
             $damager = $event->getDamager();
@@ -137,28 +150,24 @@ class LootbagHandler{
             if(!$damager instanceof Player) return;
 
             if (($entity->getHealth() - $event->getFinalDamage()) <= 0){
-                foreach ($this->lootbags as $key => $lootbag){
-                    if(in_array(1, $lootbag->obtainable)){
-                        $rand = mt_rand(1, 1000);
-                        if($lootbag->chance >= $rand){
-                            $damager->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have found a " . $lootbag->name . " lootbag");
-                            $this->addItem($damager, Main::getInstance()->getLootbagHandler()->getLootBag($key));
-        }   }   }   }
+                $luckyPenguin = $damager;
+            }
         } else {
             if(!$event->isCancelled()){
-                $player = $event->getPlayer();
-                foreach ($this->lootbags as $key => $lootbag) {
-                    if (in_array(1, $lootbag->obtainable)) {
-                        $rand = mt_rand(1, 1000);
-                        if ($lootbag->chance >= $rand) {
-                            $player->sendMessage(Main::$PREFIX . TextFormat::GRAY . " You have found a " . $lootbag->name . " lootbag");
-                            $this->addItem($player, Main::getInstance()->getLootbagHandler()->getLootBag($key));
-                        }
+                $luckyPenguin = $event->getPlayer();
+            }
+        }
+        if($luckyPenguin instanceof Player){
+            foreach ($this->lootbags as $key => $lootbag){
+                if(in_array(1, $lootbag->obtainable)){
+                    $rand = mt_rand(1, 1000);
+                    if($lootbag->chance >= $rand){
+                        $damager->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have found a " . $lootbag->name . " lootbag");
+                        $this->addItem($damager, Main::getInstance()->getLootbagHandler()->getLootBag($key));
                     }
                 }
             }
         }
-
     }
 
 
