@@ -12,7 +12,7 @@ lootbag/lootbags:
   // Give a player online a lootbag
   give: <player> <lootbag> <count>
   // Give everyone online a lootbag or multiple
-  giveall <lootbag> <count>
+  giveall: <lootbag> <count>
   // View lootbag loot in a CHEST UI
   view: <lootbag>
 ```
