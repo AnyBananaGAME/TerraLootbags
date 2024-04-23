@@ -98,13 +98,15 @@ class LootbagHandler{
         if (is_int($randomItem)) {
                 $data = explode(":", $rewards[$randomItem]);
                 $reward = $this->getReward($data, $player);
-                $loot[] = $reward;
+                if(is_string($reward)) $loot[$data[1]] = $reward;
+                if(!is_string($reward)) $loot[] = $reward;
         }
         if(is_array($randomItem)){
             foreach ($randomItem as $random) {
                 $data = explode(":", $rewards[$random]);
                 $reward = $this->getReward($data, $player);
-                $loot[] = $reward;
+                if(is_string($reward)) $loot[$data[1]] = $reward;
+                if(!is_string($reward)) $loot[] = $reward;
             }
         }
 
