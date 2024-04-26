@@ -17,24 +17,25 @@ Need help?
 Example Lootbag:
 ```yml
 types:
-  # type of the loot bag
+  # Type of the loot bag
   common:
     # Name of the loot bag
-    name: "Common Lootbag"
-    # 0: Mining
-    # 1: Killing / Slaying
-    obtainable: [0, 1]
-    # Chance X in 1000 (100 = 10%) (10 = 1%) (1 = 0.1%)
+    name: "Common Loot Bag"
+    # Ways to obtain the loot bag
+    obtainable: [0, 1] # 0: Mining, 1: Killing
+    # Chance of obtaining the loot bag (1 in 1000)
     chance: 50
-    # Reward Count
+    # Number of rewards in each loot bag
     reward-count: 1
-    # The possible rewards of a loot bag.
-    # "Item:count:ItemName"
-    #    Set the ItemName to false if you want to leave it default
-    #    You can use {player} in command for the player name.
-    # "command:DisplayText:YourCommand"
+    # Possible rewards of a loot bag
+    # Format: "Item:count:ItemName:enchant:level..."
+    # Set ItemName to false for default
+    # Use {player} for the player's name in commands
+    # To add a command: "command:DisplayText:YourCommand"
+    # To give a player an effect: "effect:EffectName:duration"
     rewards:
-      - "Salmon:1:Regular Fish:sharpness:5"
-      - "command:Says Hello:say Hello {player}"
+      - "Salmon:1:Regular Fish:sharpness:5:unbreaking:50"
+      - "command:Says Hello:say Hello"
       - "diamond:1:false"
+      - "effect:Haste:1000"
 ```
