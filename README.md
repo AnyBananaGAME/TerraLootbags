@@ -1,6 +1,6 @@
 # TerraLootbags
 
-### PocketMine-MP plugin 🗃️ that lets you create your own lootbags and custom rewards for then (Items, Commands)
+### PocketMine-MP plugin 🗃️ that lets you create your own lootbags and custom rewards for them (Items, Commands)
 Need help?
 ❓ [Discord](https://discord.gg/Mfu9CER8X2) 👾
 
