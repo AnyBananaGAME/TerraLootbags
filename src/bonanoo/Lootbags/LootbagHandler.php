@@ -2,6 +2,9 @@
 namespace bonanoo\Lootbags;
 
 use pocketmine\console\ConsoleCommandSender;
+use pocketmine\entity\effect\Effect;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\StringToEffectParser;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -63,10 +66,15 @@ class LootbagHandler{
     }
 
     public function getReward(Array $data, Player $player): Item | string{
+
         if ($data[0] === "command") {
             $command = $data[2];
             $command = str_replace("{player}", $player->getName(), $command);
-            return $command;
+            return "command_".$command;
+        } elseif($data[0] === 'effect'){
+            $effect = $data[1];
+            $duration = $data[2];
+            return "effect_".$effect.':'.$duration;
         } else {
             $item = StringToItemParser::getInstance()->parse($data[0]);
             if ($item === null) {
@@ -105,7 +113,10 @@ class LootbagHandler{
             foreach ($randomItem as $random) {
                 $data = explode(":", $rewards[$random]);
                 $reward = $this->getReward($data, $player);
-                if(is_string($reward)) $loot[$data[1]] = $reward;
+                if(is_string($reward)) {
+                    if(str_starts_with($reward, "command")) $loot["command_".$data[1]] = $reward;
+                    if(str_starts_with($reward, "effect")) $loot["effect_".$data[1]] = $reward;
+                }
                 if(!is_string($reward)) $loot[] = $reward;
             }
         }
@@ -117,10 +128,21 @@ class LootbagHandler{
         foreach ($loot as $key => $lootItem) {
             if($lootItem instanceof Item) {
                 $this->addItem($player, $lootItem);
-                $player->sendMessage(Main::$PREFIX . TextFormat::GRAY . " You have received " . $lootItem->getName() . " from a " . $lootbagItem->getName() . " lootbag");
+                $player->sendMessage(Main::$PREFIX . TextFormat::GRAY . " You have received " . $lootItem->getName() . " from a " . $lootbagItem->getName());
             } else {
-                Main::getInstance()->getServer()->dispatchCommand(new ConsoleCommandSender(Main::getInstance()->getServer(), Main::getInstance()->getServer()->getLanguage()), $lootItem);
-                $player->sendMessage(Main::$PREFIX . TextFormat::GRAY . " You have received " . $key . " from a " . $lootbagItem->getName() . " lootbag");
+                if(str_starts_with($lootItem, "command_")){
+                    $lootItem = str_replace("command_", "", $lootItem);
+                    Main::getInstance()->getServer()->dispatchCommand(new ConsoleCommandSender(Main::getInstance()->getServer(), Main::getInstance()->getServer()->getLanguage()), $lootItem);
+                    $player->sendMessage(Main::$PREFIX . TextFormat::GRAY . " You have received " . $key . " from a " . $lootbagItem->getName());
+                }
+                if(str_starts_with($lootItem, "effect_")){
+                    $lootItem = str_replace("effect_", "", $lootItem);
+                    $en = explode(":", $lootItem);
+                    $effect = StringToEffectParser::getInstance()->parse($en[0]);
+                    $effectInstance = new EffectInstance($effect, $en[1]);
+                    $player->getEffects()->add($effectInstance);
+                    $player->sendMessage(Main::$PREFIX.TextFormat::GRAY." You have received a ". $lootItem[0] . " effect for ". $en[1] ."seconds from " . $lootbagItem->getName());
+                }
             }
         }
     }
