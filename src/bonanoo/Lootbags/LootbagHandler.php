@@ -181,8 +181,10 @@ class LootbagHandler{
                 $luckyPenguin = $damager;
             }
         } else {
-            if(!$event->isCancelled()){
-                $luckyPenguin = $event->getPlayer();
+            if($event instanceof BlockBreakEvent) {
+                if(!$event->isCancelled()){
+                    $luckyPenguin = $event->getPlayer() ?? '';
+                }
             }
         }
         if($luckyPenguin instanceof Player){
